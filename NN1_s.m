@@ -1,21 +1,17 @@
 clc;close all;
-sol=dde23(@Example1,[0.2 0.3 0.2 0.3],[1;1.3;0.5;1.3;0;0;0;0;0;0;0;0;-6.2;0;-3.45;0],[0 10]);
-
+sol=dde23(@NN1,[0.2 0.3],[1;3;-1;2;0;0;0;0;0;0;0;0;-5.2;0;8.45;0;0;0;0;0;0;0;0;0;0;0],[0 10]);
 t=sol.x;
 x=sol.y;
-c=50;e=0.05;a=0.5;
-zeta=0.85;wn=80;
-g11=1;g12=1/5;g21=1;g22=1/6.25;
+c=100;e=0.05;a=0.5;
+zeta=0.7;wn=270;
+g11=1;g12=1;g21=1;g22=1;
 L1=0.05;L2=0.05;
-k11=5;k12=25;k21=6;k22=25;
-m1=2;m2=2.5;j1=5;j2=6.25;b=0.5;
-k=100;r=0.5;l=0.5;g=9.81;
-mu=2;Tf=2;
-y1r=0.5*sin(t)+0.5*sin(0.5*t);
-dy1r=0.5*cos(t)+0.25*cos(0.5*t);
-y2r=sin(0.5*t).*sin(t);
-dy2r=0.5*cos(0.5*t).*sin(t)+sin(0.5*t).*cos(t);
-
+k11=4;k12=18;k21=5;k22=20;
+mu=2;Tf=1;
+y1r=0.3*sin(t);
+dy1r=0.3*cos(t);
+y2r=0.3*cos(2*t);
+dy2r=-0.6*sin(2*t);
 Bv = ((1./(t+0.001) - 1./2.001).^4 + 0.05) .* (t <= 2) + 0.05 .* (t > 2);
 cs=[-2 -1 1 2]';
 X1=[x(1,:);x(2,:);x(5,:);x(7,:)];
@@ -57,8 +53,7 @@ else
     p2=1;
     q2=0;
 end
-f11=0; f12=((m1*g*r/j1-k*r^2/(4*j1))*sin(x(1,:))+k*r*(l-b)/(2*j1));
-f21=0; f22=((m2*g*r/j2-k*r^2/(4*j2))*sin(x(3,:))+k*r*(l-b)/(2*j2));
+f11=0; f12=(1-x(1,:).^2).*x(2,:)-x(1,:); f21=0; f22=1-x(3,:).*x(4,:).^2;
 
 z11=x(1,:)-y1r;  s11=z11./h1;  XI11=s11-x(9,:);
 alp11=-(k11.*s11+1.5.*p1.*XI11+p1.*x(5,:).*f11-p1.*dy1r+q1+p1^2*x(9,:))./(p1.*g11);
@@ -76,55 +71,35 @@ dx16=-2*zeta*wn*x(16,:)-wn*(x(15,:)-alp21);
 s22=x(4,:)-x(15,:);  XI22=s22-x(12,:);
 u2=-(k22.*s22+1.5.*XI22+x(6,:).*f22+g21.*s21.*p2-dx15+XI22.*x(8,:).*norm(phi2)./(XI22.^2+L2))./g22;
 end
+
 figure(1)
-plot(t, Bv,'--g');
+plot(t,x(7,:));
 hold on
-plot(t,-Bv,'--g');
-hold on;
-plot (t,x(1,:)-y1r);
-hold on;
-plot (t,x(3,:)-y2r);
-legend('\rho_i','-\rho_i','z_{11}','z_{21}','fontsize',14)
-ylim([-1.5 1.5]);
-xlabel('Time(sec)')
-
-figure(3)
-plot(t, u1);
-hold on;
-plot(t, u2);
-legend('u_{1}','u_{2}','fontsize',14)
-ylim([-1000 400]);
-xlabel('Time(sec)')
-
-figure(5)
-plot(t,x(1,:),'--b');
+plot(t,x(17,:));
 hold on
-plot (t,y1r);
-legend('y_{1}','y_{1,r}','fontsize',14)
-ylim([-1.5 1.5]);
-xlabel('Time(sec)')
-
-figure(6)
-plot(t,x(3,:),'--b');
+plot(t,x(19,:));
 hold on
-plot (t,y2r);
-legend('y_{2}','y_{2,r}','fontsize',14)
-ylim([-1.5 1.5]);
+plot(t,x(21,:));
+hold on
+plot(t,x(23,:));
+hold on
+plot(t,x(25,:));
+legend('$\hat\eta_{1,1}$','$\hat\eta_{1,2}$','$\hat\eta_{1,3}$','$\hat\eta_{1,4}$','$\hat\eta_{1,5}$','$\hat\eta_{1,6}$','interpreter','latex','fontsize',18)
 xlabel('Time(sec)')
+ylim([0 0.15]);
 
-figure(7)
-plot(t,x(5,:));
-hold on;
-plot (t,x(6,:));
-legend('$\hat{\theta}_1$','$\hat{\theta}_2$','interpreter','latex','fontsize',18)
-ylim([-0.2 0.6]);
+figure(2)
+plot(t,x(8,:));
+hold on
+plot(t,x(18,:));
+hold on
+plot(t,x(20,:));
+hold on
+plot(t,x(22,:));
+hold on
+plot(t,x(24,:));
+hold on
+plot(t,x(26,:));
+legend('$\hat\eta_{2,1}$','$\hat\eta_{2,2}$','$\hat\eta_{2,3}$','$\hat\eta_{2,4}$','$\hat\eta_{2,5}$','$\hat\eta_{2,6}$','interpreter','latex','fontsize',18)
 xlabel('Time(sec)')
-
-figure(9)
-plot(t, x(2,:));
-hold on;
-plot(t, x(4,:));
-legend('x_{1,2}','x_{2,2}','fontsize',14)
-ylim([-4 4]);
-xlabel('Time(sec)')
-
+ylim([0 0.15]);
